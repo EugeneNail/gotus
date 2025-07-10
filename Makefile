@@ -5,7 +5,7 @@ target := $(firstword $(MAKECMDGOALS))
 
 ifeq ($(filter up down reup, $(target)),$(target))
 	arg := $(or $(word 2, $(MAKECMDGOALS)), development)
-else ifeq ($(target),shell)
+else ifeq ($(filter shell build, $(target)),$(target))
 	arg := $(word 2, $(MAKECMDGOALS))
 endif
 
@@ -21,3 +21,13 @@ reup: down up
 
 shell:
 	docker exec -it gotus-$(arg) /bin/sh
+
+build:
+ifeq ($(arg),ui)
+	cd ui && BUILD_PATH=../web npm run build && touch ../web/.keep
+else ifeq ($(arg),api)
+	@echo "not implemented"
+else ifeq ($(arg),)
+	make build ui
+	@echo "not implemented"
+endif

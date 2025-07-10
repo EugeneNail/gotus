@@ -1,18 +1,25 @@
 package main
 
 import (
-	"fmt"
+	"net"
 	"net/http"
 	"os"
 )
 
-func main() {
-	http.HandleFunc("/ping", func(writer http.ResponseWriter, request *http.Request) {
-		if _, err := writer.Write([]byte("pong")); err != nil {
-			http.Error(writer, err.Error(), http.StatusInternalServerError)
-		}
-	})
-	fmt.Println(":" + os.Getenv("APP_PORT"))
+func newUiHandler() http.Handler {
+	return http.FileServer(http.Dir(os.Getenv("APP_ROOT") + "/web"))
+}
 
-	http.ListenAndServe(":"+os.Getenv("APP_PORT"), nil)
+func PingPongHandler(writer http.ResponseWriter, request *http.Request) {
+	if _, err := writer.Write([]byte("pong")); err != nil {
+		http.Error(writer, err.Error(), http.StatusInternalServerError)
+	}
+}
+
+func main() {
+	http.HandleFunc("/ping", PingPongHandler)
+
+	http.Handle("/", newUiHandler())
+
+	http.ListenAndServe(net.JoinHostPort("", os.Getenv("APP_PORT")), nil)
 }
