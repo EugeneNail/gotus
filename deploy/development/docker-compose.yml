@@ -1,0 +1,17 @@
+services:
+  app:
+    image: golang:1.24.4-alpine
+    container_name: gotus-app
+    working_dir: /var/www/html
+    env_file:
+      - ./.env
+    ports:
+      - ${APP_PORT}:${APP_PORT}
+    volumes:
+      - ../../api:/var/www/html/api
+      - ../../cmd:/var/www/html/cmd
+      - ../../configs:/var/www/html/configs
+      - ../../internal:/var/www/html/internal
+      - ../../web:/var/www/html/web
+    command: [ 'go', 'run', 'cmd/gotus/main.go' ]
+
