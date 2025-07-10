@@ -2,3 +2,5 @@ deploy/development/.env
 deploy/production/.env
 web/*
 !web/.gitkeep
+/storage/logs
+!/storage/logs/.gitkeep

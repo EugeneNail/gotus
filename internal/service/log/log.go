@@ -7,6 +7,7 @@ import (
 	goLog "log"
 	"os"
 	"path"
+	"syscall"
 	"time"
 )
 
@@ -15,20 +16,27 @@ var today int = -1
 var infoLogger *goLog.Logger
 var debugLogger *goLog.Logger
 var errorLogger *goLog.Logger
+var file *os.File
 
 func Initialize() {
+	file = os.NewFile(uintptr(syscall.Stdout), "initial")
 	ticker := time.NewTicker(time.Second)
+
 	for {
 		<-ticker.C
-
 		if today != time.Now().Day() {
 			filename := path.Join(os.Getenv("APP_ROOT"), "storage", "logs", time.Now().Format("2006-01-02.log"))
 
-			file, err := os.Create(filename)
+			newFile, err := os.Create(filename)
 			if err != nil {
 				panic(fmt.Errorf("cannot create a log file: %w", err))
 			}
 
+			if err := file.Close(); err != nil {
+				panic(fmt.Errorf("cannot close the log file: %w", err))
+			}
+
+			file = newFile
 			infoLogger = goLog.New(io.MultiWriter(file, os.Stdout), "[ INFO  ] ", goLog.Ldate|goLog.Ltime|goLog.Lmsgprefix)
 			debugLogger = goLog.New(io.MultiWriter(file, os.Stdout), "[ DEBUG ] ", goLog.Ldate|goLog.Ltime|goLog.Lmsgprefix|goLog.Lshortfile)
 			errorLogger = goLog.New(io.MultiWriter(file, os.Stderr), "[ ERROR ] ", goLog.Ldate|goLog.Ltime|goLog.Lmsgprefix)
