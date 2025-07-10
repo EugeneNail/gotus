@@ -2,16 +2,28 @@ services:
   app:
     image: golang:1.24.4-alpine
     container_name: gotus-app
-    working_dir: /var/www/html
+    working_dir: ${APP_ROOT}
     env_file:
       - ./.env
     ports:
       - ${APP_PORT}:${APP_PORT}
     volumes:
-      - ../../api:/var/www/html/api
-      - ../../cmd:/var/www/html/cmd
-      - ../../configs:/var/www/html/configs
-      - ../../internal:/var/www/html/internal
-      - ../../web:/var/www/html/web
+      - ../../api:${APP_ROOT}/api
+      - ../../cmd:${APP_ROOT}/cmd
+      - ../../configs:${APP_ROOT}/configs
+      - ../../internal:${APP_ROOT}/internal
+      - ../../web:${APP_ROOT}/web
     command: [ 'go', 'run', 'cmd/gotus/main.go' ]
 
+
+  ui:
+    image: node:24
+    container_name: gotus-ui
+    working_dir: ${APP_ROOT}
+    env_file:
+      - ./.env
+    volumes:
+      - ../../ui:${UI_ROOT}
+    ports:
+      - ${UI_PORT}:${UI_PORT}
+    command: bash -c "npm install && PORT=${UI_PORT} npm start"
