@@ -12,7 +12,9 @@ services:
       - ../../cmd:${APP_ROOT}/cmd
       - ../../configs:${APP_ROOT}/configs
       - ../../internal:${APP_ROOT}/internal
+      - ../../storage:${APP_ROOT}/storage
       - ../../web:${APP_ROOT}/web
+      - ../../go.mod:${APP_ROOT}/go.mod
     command: [ 'go', 'run', 'cmd/gotus/main.go' ]
 
 
