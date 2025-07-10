@@ -24,7 +24,7 @@ shell:
 
 build:
 ifeq ($(arg),ui)
-	cd ui && BUILD_PATH=../web npm run build && touch ../web/.keep
+	cd ui && BUILD_PATH=../web npm run build && touch ../web/.gitkeep
 else ifeq ($(arg),api)
 	@echo "not implemented"
 else ifeq ($(arg),)
