@@ -2,6 +2,10 @@
   <dictionary name="project">
     <words>
       <w>gotus</w>
+      <w>ldate</w>
+      <w>lmsgprefix</w>
+      <w>lshortfile</w>
+      <w>ltime</w>
     </words>
   </dictionary>
 </component>

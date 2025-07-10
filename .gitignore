@@ -1,4 +1,6 @@
 deploy/development/.env
 deploy/production/.env
 web/*
-!web/.keep
+!web/.gitkeep
+/storage/logs
+!/storage/logs/.gitkeep
