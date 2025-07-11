@@ -5,7 +5,7 @@ target := $(firstword $(MAKECMDGOALS))
 
 ifeq ($(filter up down reup, $(target)),$(target))
 	arg := $(or $(word 2, $(MAKECMDGOALS)), development)
-else ifeq ($(filter shell build, $(target)),$(target))
+else ifeq ($(filter shell build logs, $(target)),$(target))
 	arg := $(word 2, $(MAKECMDGOALS))
 endif
 
@@ -30,4 +30,11 @@ else ifeq ($(arg),api)
 else ifeq ($(arg),)
 	make build ui
 	@echo "not implemented"
+endif
+
+logs:
+ifeq ($(arg),app)
+	tail -F "./storage/logs/$$(date +'%Y-%m-%d.log')"
+else ifeq ($(arg),ui)
+	docker logs -f gotus-ui
 endif
