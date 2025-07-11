@@ -41,16 +41,27 @@ func setLoggers() {
 		}
 	}
 
+	file = openFile()
+	infoLogger = goLog.New(io.MultiWriter(file, os.Stdout), "[ INFO  ] ", goLog.Ldate|goLog.Ltime|goLog.Lmsgprefix)
+	debugLogger = goLog.New(io.MultiWriter(file, os.Stdout), "[ DEBUG ] ", goLog.Ldate|goLog.Ltime|goLog.Lmsgprefix)
+	errorLogger = goLog.New(io.MultiWriter(file, os.Stderr), "[ ERROR ] ", goLog.Ldate|goLog.Ltime|goLog.Lmsgprefix)
+}
+
+func openFile() *os.File {
 	filename := path.Join(os.Getenv("APP_ROOT"), "storage", "logs", time.Now().Format("2006-01-02.log"))
-	newFile, err := os.OpenFile(filename, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	file, err := os.OpenFile(filename, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		panic(fmt.Errorf("cannot create a log file: %w", err))
 	}
 
-	file = newFile
-	infoLogger = goLog.New(io.MultiWriter(file, os.Stdout), "[ INFO  ] ", goLog.Ldate|goLog.Ltime|goLog.Lmsgprefix)
-	debugLogger = goLog.New(io.MultiWriter(file, os.Stdout), "[ DEBUG ] ", goLog.Ldate|goLog.Ltime|goLog.Lmsgprefix)
-	errorLogger = goLog.New(io.MultiWriter(file, os.Stderr), "[ ERROR ] ", goLog.Ldate|goLog.Ltime|goLog.Lmsgprefix)
+	return file
+}
+
+func RedirectPanicToLogger() {
+	if x := recover(); x != nil {
+		Error(x)
+		os.Exit(1)
+	}
 }
 
 // Info writes a message prefixed with [ INFO  ] into a file and Stdout

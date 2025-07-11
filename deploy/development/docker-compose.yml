@@ -1,6 +1,6 @@
 services:
   app:
-    image: golang:1.24.4-alpine
+    image: golang:1.24.4
     container_name: gotus-app
     working_dir: ${APP_ROOT}
     env_file:
@@ -15,7 +15,7 @@ services:
       - ../../storage:${APP_ROOT}/storage
       - ../../web:${APP_ROOT}/web
       - ../../go.mod:${APP_ROOT}/go.mod
-    command: [ 'go', 'run', 'cmd/gotus/main.go' ]
+    command: bash -c "go run cmd/gotus/main.go"
 
 
   ui:

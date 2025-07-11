@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/EugeneNail/gotus/internal/service/log"
-	"net"
+	"github.com/EugeneNail/gotus/internal/core/log"
+	"github.com/EugeneNail/gotus/internal/core/routing"
 	"net/http"
 	"os"
 	"path"
@@ -19,10 +19,14 @@ func PingPongHandler(writer http.ResponseWriter, request *http.Request) {
 }
 
 func main() {
-	http.HandleFunc("/ping", PingPongHandler)
+	log.Initialize()
 	http.Handle("/", newUiHandler())
 
-	go log.Initialize()
+	routing.Start()
+}
 
-	http.ListenAndServe(net.JoinHostPort("", os.Getenv("APP_PORT")), nil)
+func response(message string) http.HandlerFunc {
+	return func(writer http.ResponseWriter, request *http.Request) {
+		writer.Write([]byte(message))
+	}
 }
