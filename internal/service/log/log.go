@@ -7,7 +7,8 @@ import (
 	goLog "log"
 	"os"
 	"path"
-	"syscall"
+	"runtime"
+	"strings"
 	"time"
 )
 
@@ -19,46 +20,70 @@ var errorLogger *goLog.Logger
 var file *os.File
 
 func Initialize() {
-	file = os.NewFile(uintptr(syscall.Stdout), "initial")
 	ticker := time.NewTicker(time.Second)
+	setLoggers()
 
-	for {
-		<-ticker.C
-		if today != time.Now().Day() {
-			filename := path.Join(os.Getenv("APP_ROOT"), "storage", "logs", time.Now().Format("2006-01-02.log"))
-
-			newFile, err := os.Create(filename)
-			if err != nil {
-				panic(fmt.Errorf("cannot create a log file: %w", err))
+	go func() {
+		for range ticker.C {
+			if today != time.Now().Day() {
+				setLoggers()
+				today = time.Now().Day()
 			}
-
-			if err := file.Close(); err != nil {
-				panic(fmt.Errorf("cannot close the log file: %w", err))
-			}
-
-			file = newFile
-			infoLogger = goLog.New(io.MultiWriter(file, os.Stdout), "[ INFO  ] ", goLog.Ldate|goLog.Ltime|goLog.Lmsgprefix)
-			debugLogger = goLog.New(io.MultiWriter(file, os.Stdout), "[ DEBUG ] ", goLog.Ldate|goLog.Ltime|goLog.Lmsgprefix|goLog.Lshortfile)
-			errorLogger = goLog.New(io.MultiWriter(file, os.Stderr), "[ ERROR ] ", goLog.Ldate|goLog.Ltime|goLog.Lmsgprefix)
-
-			today = time.Now().Day()
 		}
+	}()
+
+}
+
+func setLoggers() {
+	if file != nil {
+		if err := file.Close(); err != nil {
+			panic(fmt.Errorf("cannot close the log file: %w", err))
+		}
+	}
+
+	file = openFile()
+	infoLogger = goLog.New(io.MultiWriter(file, os.Stdout), "[ INFO  ] ", goLog.Ldate|goLog.Ltime|goLog.Lmsgprefix)
+	debugLogger = goLog.New(io.MultiWriter(file, os.Stdout), "[ DEBUG ] ", goLog.Ldate|goLog.Ltime|goLog.Lmsgprefix)
+	errorLogger = goLog.New(io.MultiWriter(file, os.Stderr), "[ ERROR ] ", goLog.Ldate|goLog.Ltime|goLog.Lmsgprefix)
+}
+
+func openFile() *os.File {
+	filename := path.Join(os.Getenv("APP_ROOT"), "storage", "logs", time.Now().Format("2006-01-02.log"))
+	file, err := os.OpenFile(filename, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		panic(fmt.Errorf("cannot create a log file: %w", err))
+	}
+
+	return file
+}
+
+func RedirectPanicToLogger() {
+	if x := recover(); x != nil {
+		Error(x)
+		os.Exit(1)
 	}
 }
 
 // Info writes a message prefixed with [ INFO  ] into a file and Stdout
 func Info(messages ...any) {
-	infoLogger.Println(messages)
+	infoLogger.Println(messages...)
 }
 
-// Debug writes a message prefixed with [ DEBUG ] into a file and Stdout, but only if ENVIRONMENT is "development"
+// Debug writes a message prefixed with [ DEBUG ] into a file and Stdout and including file name and line number, but only if ENVIRONMENT is "development"
 func Debug(messages ...any) {
 	if os.Getenv("ENVIRONMENT") == environment.Development.ToString() {
-		debugLogger.Println(messages)
+		_, file, line, ok := runtime.Caller(1)
+		if !ok {
+			panic(fmt.Errorf("cannot recover caller information"))
+		}
+
+		location := strings.ReplaceAll(fmt.Sprintf("at %s:%d", file, line), os.Getenv("APP_ROOT"), "")
+		messages = append(messages, location)
+		debugLogger.Println(messages...)
 	}
 }
 
 // Error writes a message prefixed with [ ERROR  ] into a file and Stderr
 func Error(messages ...any) {
-	errorLogger.Println(messages)
+	errorLogger.Println(messages...)
 }
