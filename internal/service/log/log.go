@@ -42,9 +42,9 @@ func setLoggers() {
 	}
 
 	file = openFile()
-	infoLogger = goLog.New(io.MultiWriter(file, os.Stdout), "[ INFO  ] ", goLog.Ldate|goLog.Ltime|goLog.Lmsgprefix)
-	debugLogger = goLog.New(io.MultiWriter(file, os.Stdout), "[ DEBUG ] ", goLog.Ldate|goLog.Ltime|goLog.Lmsgprefix)
-	errorLogger = goLog.New(io.MultiWriter(file, os.Stderr), "[ ERROR ] ", goLog.Ldate|goLog.Ltime|goLog.Lmsgprefix)
+	infoLogger = goLog.New(io.MultiWriter(file, os.Stdout), "[ INFO  ] ", goLog.Ldate|goLog.Ltime|goLog.Lmicroseconds|goLog.Lmsgprefix)
+	debugLogger = goLog.New(io.MultiWriter(file, os.Stdout), "[ DEBUG ] ", goLog.Ldate|goLog.Ltime|goLog.Lmicroseconds|goLog.Lmsgprefix)
+	errorLogger = goLog.New(io.MultiWriter(file, os.Stderr), "[ ERROR ] ", goLog.Ldate|goLog.Ltime|goLog.Lmicroseconds|goLog.Lmsgprefix)
 }
 
 func openFile() *os.File {

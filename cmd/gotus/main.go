@@ -8,21 +8,14 @@ import (
 	"path"
 )
 
-func newUiHandler() http.Handler {
-	return http.FileServer(http.Dir(path.Join(os.Getenv("APP_ROOT"), "web")))
-}
-
-func PingPongHandler(writer http.ResponseWriter, request *http.Request) {
-	if _, err := writer.Write([]byte("pong")); err != nil {
-		http.Error(writer, err.Error(), http.StatusInternalServerError)
-	}
-}
-
 func main() {
-	http.HandleFunc("/ping", PingPongHandler)
-	http.Handle("/", newUiHandler())
+	log.Initialize()
 
-	go log.Initialize()
+	router := http.NewServeMux()
+	router.Handle(`/`, http.FileServer(http.Dir(path.Join(os.Getenv("APP_ROOT"), "web"))))
 
-	http.ListenAndServe(net.JoinHostPort("", os.Getenv("APP_PORT")), nil)
+	log.Info("Server started")
+	if err := http.ListenAndServe(net.JoinHostPort("", os.Getenv("APP_PORT")), router); err != nil {
+		log.Error(err)
+	}
 }
