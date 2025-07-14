@@ -8,15 +8,17 @@ import (
 	"net/http"
 )
 
-func WriteResponse(next func(*http.Request) *transport.Response) http.HandlerFunc {
-	return func(writer http.ResponseWriter, request *http.Request) {
-		response := next(request)
+// WriteResponse is a middleware that extracts a payload from the response and writes it using an http.ResponseWriter.
+// The response status and data are overwritten if there is a problem during writing to a buffer.
+func WriteResponse[T transport.Payload](next transport.HandlerFunc[T]) transport.HandlerFunc[T] {
+	return func(writer http.ResponseWriter, request *transport.Request[T]) *transport.Response {
+		response := next(writer, request)
 		var buffer bytes.Buffer
 
 		err := response.Writer.Write(response, &buffer, writer)
 		if err != nil {
-			handleError(writer, request, err)
-			return
+			handleError(writer, request.Request, err)
+			return response
 		}
 
 		writer.WriteHeader(response.Status)
@@ -25,13 +27,16 @@ func WriteResponse(next func(*http.Request) *transport.Response) http.HandlerFun
 		}
 
 		if response.Status >= 400 {
-			log.Error(buildErrorMessage(response.Message, request))
+			log.Error(buildErrorMessage(response.Message, request.Request))
 		}
+
+		return response
 	}
 }
 
 func handleError(writer http.ResponseWriter, request *http.Request, err error) {
 	log.Error(buildErrorMessage(err.Error(), request))
+
 	writer.WriteHeader(http.StatusInternalServerError)
 	if _, err := writer.Write([]byte(err.Error())); err != nil {
 		http.Error(writer, err.Error(), http.StatusInternalServerError)
