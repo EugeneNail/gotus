@@ -4,3 +4,4 @@ web/*
 !web/.gitkeep
 /storage/logs
 !/storage/logs/.gitkeep
+/vendor

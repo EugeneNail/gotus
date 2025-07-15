@@ -16,6 +16,7 @@ services:
       - ../../web:${APP_ROOT}/web
       - ../../go.mod:${APP_ROOT}/go.mod
       - ../../go.sum:${APP_ROOT}/go.sum
+      - ../../vendor:${APP_ROOT}/vendor
     command: [ 'go', 'run', 'cmd/gotus/main.go' ]
 
 

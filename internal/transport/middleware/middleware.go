@@ -14,6 +14,7 @@ func Web[T transport.Payload](handler transport.HandlerFunc[T]) http.HandlerFunc
 	middlewares := []Middleware[T]{
 		SetRequestId[T],
 		WriteResponse[T],
+		Validate[T],
 	}
 
 	return Chain(handler, middlewares)
