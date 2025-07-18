@@ -1,4 +1,3 @@
-.PHONY: shell up production development
 .SILENT:
 
 target := $(firstword $(MAKECMDGOALS))
@@ -7,6 +6,9 @@ ifeq ($(filter up down reup, $(target)),$(target))
 	arg := $(or $(word 2, $(MAKECMDGOALS)), development)
 else ifeq ($(filter shell build logs, $(target)),$(target))
 	arg := $(word 2, $(MAKECMDGOALS))
+else ifeq (command,$(target))
+	arg := $(word 2, $(MAKECMDGOALS))
+	subArgs := $(wordlist 3, 99, $(MAKECMDGOALS))
 endif
 
 
@@ -38,3 +40,6 @@ ifeq ($(arg),app)
 else ifeq ($(arg),ui)
 	docker logs -f gotus-ui
 endif
+
+command:
+	docker exec gotus-$(arg) sh -c "$(subArgs)"
