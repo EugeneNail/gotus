@@ -42,4 +42,4 @@ else ifeq ($(arg),ui)
 endif
 
 command:
-	docker exec gotus-$(arg) sh -c "$(subArgs)"
+	docker exec -it gotus-$(arg) sh -c "$(subArgs)"
