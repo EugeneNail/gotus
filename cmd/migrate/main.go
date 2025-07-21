@@ -6,6 +6,8 @@ import (
 	"github.com/EugeneNail/gotus/internal/database"
 	_ "github.com/lib/pq"
 	"os"
+	"path"
+	"time"
 )
 
 func main() {
@@ -17,7 +19,7 @@ func main() {
 
 	switch os.Args[1] {
 	case "create":
-		fmt.Println("created")
+		create()
 	case "rollback":
 		fmt.Println("rollbacked")
 	default:
@@ -28,6 +30,31 @@ func main() {
 func migrate() {
 	db := database.Connect()
 	createMigrationsTable(db)
+}
+
+func create() {
+	if len(os.Args) < 3 {
+		fmt.Println("Expected name of the migration")
+		return
+	}
+
+	now := time.Now().Format("2006_02_01_150405")
+
+	file, err := os.Create(path.Join(buildDirectory(), fmt.Sprintf("%s.%s.up.sql", now, os.Args[2])))
+	if err != nil {
+		panic(err)
+	}
+	defer file.Close()
+
+	file, err = os.Create(path.Join(buildDirectory(), fmt.Sprintf("%s.%s.down.sql", now, os.Args[2])))
+	if err != nil {
+		panic(err)
+	}
+	defer file.Close()
+}
+
+func buildDirectory() string {
+	return path.Join(os.Getenv("APP_ROOT"), "deploy", "migrations")
 }
 
 func createMigrationsTable(db *sql.DB) {

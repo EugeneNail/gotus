@@ -1,4 +1,5 @@
-.SILENT:
+.SILENT: ;
+.NOTPARALLEL: ;
 
 target := $(firstword $(MAKECMDGOALS))
 
