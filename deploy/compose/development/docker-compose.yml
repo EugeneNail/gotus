@@ -4,13 +4,14 @@ services:
     container_name: gotus-app
     working_dir: ${APP_ROOT}
     env_file:
-      - ./.env
+      - .env
     ports:
       - ${APP_PORT}:${APP_PORT}
     volumes:
       - ../../api:${APP_ROOT}/api
       - ../../cmd:${APP_ROOT}/cmd
       - ../../configs:${APP_ROOT}/configs
+      - ../../deploy/migrations:${APP_ROOT}/deploy/migrations
       - ../../internal:${APP_ROOT}/internal
       - ../../storage:${APP_ROOT}/storage
       - ../../web:${APP_ROOT}/web
@@ -28,7 +29,7 @@ services:
     container_name: gotus-ui
     working_dir: ${APP_ROOT}
     env_file:
-      - ./.env
+      - .env
     volumes:
       - ../../ui:${UI_ROOT}
     ports:
@@ -39,7 +40,7 @@ services:
     image: postgres:17
     container_name: gotus-db
     env_file:
-      - ./.env
+      - .env
     ports:
       - "5432:5432"
     volumes:
