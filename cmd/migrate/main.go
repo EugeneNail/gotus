@@ -8,13 +8,8 @@ import (
 	"os"
 )
 
-const colorRed = "\033[31m"
-const colorYellow = "\033[33m"
-const colorGreen = "\033[32m"
-const colorWhite = "\033[0m"
-
 func main() {
-	//command := flag.NewFlagSet("migrate", flag.ExitOnError)
+	//migrateCommand := flag.NewFlagSet("migrate", flag.ExitOnError)
 	if len(os.Args) == 1 {
 		migrate()
 		return
@@ -51,7 +46,7 @@ func createMigrationsTable(db *sql.DB) {
 		return
 	}
 
-	fmt.Println(colorize(colorYellow, "The table 'migrations' does not exist."))
+	fmt.Println("The table 'migrations' does not exist.")
 	fmt.Print("Create one? [Y/n]: ")
 
 	var answer string
@@ -60,7 +55,7 @@ func createMigrationsTable(db *sql.DB) {
 	}
 
 	if answer != "Y" {
-		fmt.Println(colorize(colorRed, "Exited due to missing migration table"))
+		fmt.Println("Exited due to missing migration table")
 		os.Exit(0)
 	}
 
@@ -77,9 +72,5 @@ func createMigrationsTable(db *sql.DB) {
 		panic(err)
 	}
 
-	fmt.Println(colorize(colorGreen, "The table 'migrations' has been created"))
-}
-
-func colorize(color string, message string) string {
-	return color + message + colorWhite
+	fmt.Println("The table 'migrations' has been created")
 }
