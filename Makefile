@@ -15,10 +15,10 @@ endif
 
 
 up:
-	docker compose -f ./deploy/$(arg)/docker-compose.yml up -d
+	docker compose -f ./deploy/compose/$(arg)/docker-compose.yml up -d
 
 down:
-	docker compose -f ./deploy/$(arg)/docker-compose.yml down
+	docker compose -f ./deploy/compose/$(arg)/docker-compose.yml down
 
 reup: down up
 

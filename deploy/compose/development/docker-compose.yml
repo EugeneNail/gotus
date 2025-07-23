@@ -8,16 +8,16 @@ services:
     ports:
       - ${APP_PORT}:${APP_PORT}
     volumes:
-      - ../../api:${APP_ROOT}/api
-      - ../../cmd:${APP_ROOT}/cmd
-      - ../../configs:${APP_ROOT}/configs
-      - ../../deploy/migrations:${APP_ROOT}/deploy/migrations
-      - ../../internal:${APP_ROOT}/internal
-      - ../../storage:${APP_ROOT}/storage
-      - ../../web:${APP_ROOT}/web
-      - ../../go.mod:${APP_ROOT}/go.mod
-      - ../../go.sum:${APP_ROOT}/go.sum
-      - ../../vendor:${APP_ROOT}/vendor
+      - ../../../api:${APP_ROOT}/api
+      - ../../../cmd:${APP_ROOT}/cmd
+      - ../../../configs:${APP_ROOT}/configs
+      - ../../../deploy/migrations:${APP_ROOT}/deploy/migrations
+      - ../../../internal:${APP_ROOT}/internal
+      - ../../../storage:${APP_ROOT}/storage
+      - ../../../web:${APP_ROOT}/web
+      - ../../../go.mod:${APP_ROOT}/go.mod
+      - ../../../go.sum:${APP_ROOT}/go.sum
+      - ../../../vendor:${APP_ROOT}/vendor
     depends_on:
       db:
         condition: service_healthy
@@ -31,7 +31,7 @@ services:
     env_file:
       - .env
     volumes:
-      - ../../ui:${UI_ROOT}
+      - ../../../ui:${UI_ROOT}
     ports:
       - ${UI_PORT}:${UI_PORT}
     command: bash -c "npm install && PORT=${UI_PORT} npm start"
@@ -44,7 +44,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ${APP_ROOT}/postgres/data/development:/var/lib/postgresql/data
+      - ../../../storage/database/postgres/development:/var/lib/postgresql/data
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready" ]
       interval: 1s

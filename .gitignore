@@ -1,8 +1,10 @@
-deploy/development/.env
-deploy/production/.env
+deploy/compose/development/.env
+deploy/compose/production/.env
 web/*
 !web/.gitkeep
 /storage/logs
 !/storage/logs/.gitkeep
 /vendor
 /.idea
+/deploy/migrations/*.sql
+/storage/database
